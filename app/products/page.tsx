@@ -103,7 +103,7 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const applyFilters = () => {
-    let result = products.filter(
+    const result = products.filter(
       (product) =>
         (selectedCategory === "All" || product.category === selectedCategory) &&
         (selectedColor === "All" || product.color === selectedColor) &&
