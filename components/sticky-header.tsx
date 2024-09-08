@@ -1,53 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun, ShoppingCart, Menu } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ShoppingCart, Search, Menu, X, Moon, Sun } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
-export default function Component() {
-  const [isSticky, setIsSticky] = useState(false);
+export default function StickyHeader() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  if (!mounted) return null;
-
-  const NavItems = () => (
-    <>
-      <li>
-        <Button variant="ghost">Home</Button>
-      </li>
-      <li>
-        <Button variant="ghost">About</Button>
-      </li>
-      <li>
-        <Button variant="ghost">Services</Button>
-      </li>
-      <li>
-        <Button variant="ghost">Contact</Button>
-      </li>
-    </>
-  );
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
 
   const ThemeToggle = () => (
     <div className="flex items-center space-x-2">
@@ -61,54 +28,124 @@ export default function Component() {
   );
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 transition-all duration-300 ease-in-out z-10 ${
-        isSticky
-          ? "bg-background shadow-md py-2"
-          : "bg-background/60 backdrop-blur-md py-4"
-      }`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
-          <div className="text-2xl font-bold">Shopping App</div>
-          <nav className="hidden md:flex items-center space-x-4">
-            <ul className="flex space-x-4">
-              <NavItems />
-            </ul>
-            <ThemeToggle />
-            <Link href="/cart">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">Cart</span>
-              </Button>
+    <>
+      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-stone-950/95 dark:supports-[backdrop-filter]:bg-stone-950/60">
+        <div className="container flex h-14 items-center">
+          <div className="mr-4 hidden md:flex">
+            <Link className="mr-6 flex items-center space-x-2" href="/">
+              <ShoppingCart className="h-6 w-6" />
+              <span className="hidden font-bold sm:inline-block">
+                FashionStore
+              </span>
             </Link>
-          </nav>
-          <div className="md:hidden flex items-center">
-            <Link href="/cart" className="mr-2">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">Cart</span>
-              </Button>
-            </Link>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-[1.2rem] w-[1.2rem]" />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <nav className="flex flex-col space-y-4 mt-4">
-                  <ul className="flex flex-col space-y-2">
-                    <NavItems />
-                  </ul>
-                  <ThemeToggle />
-                </nav>
-              </SheetContent>
-            </Sheet>
+            <nav className="flex items-center space-x-6 text-sm font-medium">
+              <Link href="/products">Products</Link>
+              <Link href="/categories">Categories</Link>
+              <Link href="/deals">Deals</Link>
+              <Link href="/about">About</Link>
+            </nav>
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+            onClick={toggleDrawer}
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle Menu</span>
+          </Button>
+          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+            <div className="w-full flex-1 md:w-auto md:flex-none">
+              <form>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-stone-500 dark:text-stone-400" />
+                  <Input
+                    type="search"
+                    placeholder="Search products..."
+                    className="w-full bg-white pl-8 md:w-[300px] md:focus:w-[500px] lg:w-[300px] lg:focus:w-[600px] dark:bg-stone-950"
+                  />
+                </div>
+              </form>
+            </div>
+            <nav className="flex items-center">
+              <Link
+                href="/cart"
+                className={buttonVariants({ variant: "ghost", size: "icon" })}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className="sr-only">Shopping Cart</span>
+              </Link>
+              <ThemeToggle />
+            </nav>
           </div>
         </div>
+      </header>
+      {/* Side Drawer */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${
+          isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out`}
+      >
+        <div className="p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4"
+            onClick={toggleDrawer}
+          >
+            <X className="h-6 w-6" />
+            <span className="sr-only">Close Menu</span>
+          </Button>
+          <nav className="mt-8">
+            <ul className="space-y-4">
+              <li>
+                <Link
+                  href="/products"
+                  className="text-lg font-medium"
+                  onClick={toggleDrawer}
+                >
+                  Products
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/categories"
+                  className="text-lg font-medium"
+                  onClick={toggleDrawer}
+                >
+                  Categories
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/deals"
+                  className="text-lg font-medium"
+                  onClick={toggleDrawer}
+                >
+                  Deals
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-lg font-medium"
+                  onClick={toggleDrawer}
+                >
+                  About
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
-    </header>
+
+      {/* Overlay */}
+      {isDrawerOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={toggleDrawer}
+        ></div>
+      )}
+    </>
   );
 }
